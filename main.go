@@ -28,12 +28,13 @@ func home(w http.ResponseWriter, r *http.Request) {
 func events(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/event-stream")
 
-	tokens := []string{
-		"this", "is", "a", "stream"}
+	tokens := []string{"this", "is", "a", "stream"}
 
 	for _, token := range tokens {
 		content := fmt.Sprintf("data: %s \n\n", string(token))
 
+		//We write the response to the buffer, and immediately flush the buffer,
+		//else all the response will be flushed after the loop finishes
 		w.Write([]byte(content))
 		w.(http.Flusher).Flush()
 
