@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net/http"
 	"time"
+
+	"github.com/gorilla/websocket"
 )
 
 var addr = flag.String("addr", ":3000", "Address")
@@ -25,6 +27,7 @@ func home(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Welcome to the home page!")
 }
 
+// Server Sent Events
 func events(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/event-stream")
 
@@ -40,4 +43,21 @@ func events(w http.ResponseWriter, r *http.Request) {
 
 		time.Sleep(time.Millisecond * 420)
 	}
+}
+
+// Websocket
+func (c *Console) wsHandler(w http.ResponseWriter, r *http.Request) {
+	//Here the switching between http to ws happens
+	conn, err := websocket.upgrader(w, r, nil, 1024, 1024)
+	if err != nil {
+		http.Error(w, "error upgrading websocket connection", 400)
+		return
+	}
+
+	if err != nil {
+		http.Error(w, "error accepting websocket connection", 400)
+		return
+	}
+
+	defer conn.Close(websocket.CloseNormalClosure, "closed")
 }
